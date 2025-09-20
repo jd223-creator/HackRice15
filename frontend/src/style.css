@@ -1,0 +1,88 @@
+/* src/style.css */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: #f4f7f6;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 1rem;
+}
+
+.container {
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+h1 {
+  color: #2c3e50;
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #555;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box; 
+}
+
+.currency-selectors {
+  display: flex;
+  gap: 1rem;
+}
+
+.currency-selectors .input-group {
+  flex: 1;
+}
+
+button {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+#result-display {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #e9f5ff;
+  border-radius: 8px;
+  min-height: 50px;
+}
+
+#result-display h2 {
+  margin: 0;
+  color: #0056b3;
+  font-size: 1.25rem;
+}
