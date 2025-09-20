@@ -1,2 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+
+# Environment variables
 .env
-__pycache__
+
+# Databases
+*.db
+
+# OS / Editor junk
+.DS_Store
+.vscode/
+.idea/
