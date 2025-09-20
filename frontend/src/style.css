@@ -1,0 +1,131 @@
+/* General body styling */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  overflow: hidden; /* Prevent scrolling the page */
+}
+
+/* Map container takes up the full screen */
+.map-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Sidebar styling */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 400px;
+  max-width: 90%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  transform: translateX(-100%); /* Start off-screen */
+  transition: transform 0.3s ease-in-out; /* Smooth animation */
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+/* This class is added when the sidebar should be visible */
+.sidebar.open {
+  transform: translateX(0); /* Move it on-screen */
+}
+
+/* The button to open/close the sidebar */
+.sidebar-toggle-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #007bff;
+  color: white;
+  font-size: 24px;
+  line-height: 40px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 1001; /* Must be above the sidebar */
+  transition: transform 0.3s ease-in-out;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* When the sidebar is open, the button moves with it */
+.sidebar.open + .sidebar-toggle-btn {
+  transform: translateX(400px);
+}
+
+/* Converter UI styling inside the sidebar */
+.converter-ui {
+  padding: 2rem;
+  overflow-y: auto; /* Allow scrolling if content is too tall */
+}
+
+h1 {
+  color: #2c3e50;
+  margin-top: 0;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.currency-selectors {
+  display: flex;
+  gap: 1rem;
+}
+
+.currency-selectors .input-group {
+  flex: 1;
+}
+
+button {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.result-display {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #e9f5ff;
+  border-radius: 8px;
+  min-height: 50px;
+}
+
+.result-display h2 {
+  margin: 0;
+  color: #0056b3;
+}
