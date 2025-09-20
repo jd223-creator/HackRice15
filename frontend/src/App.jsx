@@ -6,40 +6,69 @@ import "mapbox-gl/dist/mapbox-gl.css";
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
 
 function App() {
-  // State for our currency translator
+  // --- State ---
   const [amount, setAmount] = useState("100");
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("INR");
   const [language, setLanguage] = useState("English");
   const [result, setResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
+  // NEW: State to hold the list of all currencies
+  const [currencies, setCurrencies] = useState({});
 
-  // Map setup (deferred until user opens modal)
+  // --- Map setup ---
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const [showMapModal, setShowMapModal] = useState(false);
-
-  const handleConversion = async () => {
-    setIsLoading(true);
-    console.log(`Converting ${amount} ${fromCurrency} to ${toCurrency}...`);
-
-    setTimeout(() => {
-      setResult(`(Sample Result) ${amount} ${fromCurrency} is a lot of ${toCurrency}!`);
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  // Initialize the map only when the modal is visible and the token exists.
+  
+  // NEW: useEffect to fetch all currencies when the app loads
   useEffect(() => {
-    if (!showMapModal) return;
-    // If there's no token, don't attempt to initialize Mapbox (we'll show a fallback).
-    if (!mapboxgl.accessToken) {
-      console.warn("Mapbox access token is not set. Showing fallback map.");
+    const fetchCurrencies = async () => {
+      try {
+        const response = await fetch('https://api.frankfurter.app/currencies');
+        const data = await response.json();
+        setCurrencies(data);
+      } catch (error) {
+        console.error("Failed to fetch currencies:", error);
+      }
+    };
+    
+    fetchCurrencies();
+  }, []); // The empty array [] means this effect runs only once
+
+  // FIXED: handleConversion now uses the real API
+  const handleConversion = async () => {
+    if (!amount || amount <= 0) {
+      alert("Please enter a valid amount.");
       return;
     }
+    setIsLoading(true);
+    setResult(''); // Clear previous result
 
-    if (mapRef.current) return; // already initialized
+    try {
+      // Fetch the conversion rate from the Frankfurter API
+      const response = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${fromCurrency}&to=${toCurrency}`);
+      const data = await response.json();
+      const convertedAmount = data.rates[toCurrency];
 
+      // Display the result
+      const resultText = `${amount} ${fromCurrency} is equal to ${convertedAmount.toFixed(2)} ${toCurrency}`;
+      setResult(resultText);
+      // TODO: Add Gemini API call here to translate resultText
+
+    } catch (error) {
+      console.error("Conversion failed:", error);
+      setResult("Error: Could not perform conversion.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ... (keep the useEffect for the map as it is) ...
+  useEffect(() => {
+    if (!showMapModal || !mapboxgl.accessToken) return;
+    if (mapRef.current) return;
     try {
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
@@ -47,27 +76,17 @@ function App() {
         center: [-74.5, 40],
         zoom: 9,
       });
-
-      new mapboxgl.Marker()
-        .setLngLat([-74.5, 40])
-        .setPopup(new mapboxgl.Popup().setHTML("<h3>Tax rate: 15%</h3>"))
-        .addTo(mapRef.current);
     } catch (err) {
       console.error("Failed to initialize Mapbox map:", err);
     }
-
-    // Cleanup when modal closes
     return () => {
       if (mapRef.current) {
-        try {
-          mapRef.current.remove();
-        } catch (e) {
-          // ignore remove errors
-        }
+        try { mapRef.current.remove(); } catch (e) {}
         mapRef.current = null;
       }
     };
   }, [showMapModal]);
+
 
   return (
     <div className="container">
@@ -84,7 +103,7 @@ function App() {
           />
         </div>
 
-        {/* Currency Selectors */}
+        {/* Currency Selectors - NOW DYNAMIC */}
         <div className="currency-selectors">
           <div className="input-group">
             <label htmlFor="from-currency">From</label>
@@ -93,9 +112,9 @@ function App() {
               value={fromCurrency}
               onChange={(e) => setFromCurrency(e.target.value)}
             >
-              <option value="USD">USD - United States Dollar</option>
-              <option value="EUR">EUR - Euro</option>
-              <option value="GBP">GBP - British Pound</option>
+              {Object.entries(currencies).map(([code, name]) => (
+                <option key={code} value={code}>{code} - {name}</option>
+              ))}
             </select>
           </div>
           <div className="input-group">
@@ -105,9 +124,9 @@ function App() {
               value={toCurrency}
               onChange={(e) => setToCurrency(e.target.value)}
             >
-              <option value="INR">INR - Indian Rupee</option>
-              <option value="MXN">MXN - Mexican Peso</option>
-              <option value="CAD">CAD - Canadian Dollar</option>
+              {Object.entries(currencies).map(([code, name]) => (
+                <option key={code} value={code}>{code} - {name}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -134,38 +153,16 @@ function App() {
 
       <div id="result-display">{result && <h2>{result}</h2>}</div>
 
-      {/* Map controls - open modal */}
+      {/* ... (keep the map modal JSX as it is) ... */}
       <div style={{ marginTop: "1rem" }}>
         <button onClick={() => setShowMapModal(true)}>Show Map</button>
       </div>
-
-      {/* Modal for map - clicking backdrop or the close button will close it */}
       {showMapModal && (
-        <div
-          className="modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setShowMapModal(false)}
-        >
-          <div
-            className="modal"
-            onClick={(e) => e.stopPropagation()} // prevent backdrop close when clicking modal
-          >
-            <button
-              className="modal-close"
-              aria-label="Close map"
-              onClick={() => setShowMapModal(false)}
-            >
-              ×
-            </button>
-
-            {/* If no Mapbox token, show a lightweight OpenStreetMap iframe as a fallback */}
+        <div className="modal-backdrop" onClick={() => setShowMapModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowMapModal(false)}>×</button>
             {mapboxgl.accessToken ? (
-              <div
-                ref={mapContainerRef}
-                className="map-container"
-                aria-label="Map container"
-              />
+              <div ref={mapContainerRef} className="map-container" />
             ) : (
               <div className="map-fallback">
                 <iframe
@@ -173,9 +170,6 @@ function App() {
                   src="https://www.openstreetmap.org/export/embed.html?bbox=-74.6%2C39.9%2C-74.4%2C40.1&layer=mapnik"
                   style={{ border: 0, width: "100%", height: "100%" }}
                 />
-                <p style={{ fontSize: 12, marginTop: 8 }}>
-                  Mapbox token not configured. Showing OpenStreetMap fallback.
-                </p>
               </div>
             )}
           </div>
