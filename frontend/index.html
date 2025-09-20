@@ -18,29 +18,38 @@
 <body>
   <!-- the content inside <body> is what gets displayed on the page -->
 
-  <div class="container">
-    <!-- This <div> acts as a wrapper for everything on the page.
-         A <div> is a block-level container element used to group content. -->
+<div class="converter-ui">
+  <div class="input-group">
+    <label for="amount-input">Amount</label>
+    <input type="number" id="amount-input" placeholder="100.00" />
+  </div>
 
-    <h1>Task Manager</h1>
-    <!-- <h1> is the main heading. You can have h1 through h6 for decreasing importance. -->
+  <div class="currency-selectors">
+    <div class="input-group">
+      <label for="from-currency">From</label>
+      <select id="from-currency">
+        <option value="USD">USD - United States Dollar</option>
+        <option value="EUR">EUR - Euro</option>
+        <option value="INR">INR - Indian Rupee</option>
+        <option value="MXN">MXN - Mexican Peso</option>
+      </select>
+    </div>
 
-    <form id="task-form">
-      <!-- <form> is used to collect user input. We give it an ID so JavaScript can reference it. -->
+    <div class="input-group">
+      <label for="to-currency">To</label>
+      <select id="to-currency">
+        <option value="INR">INR - Indian Rupee</option>
+        <option value="MXN">MXN - Mexican Peso</option>
+        <option value="INR">INR - Indian Rupee</option>
+        <option value="MXN">MXN - Mexican Peso</option>
+      </select>
+    </div>
+  </div>
 
-      <input type="text" id="task-input" placeholder="Enter your task..." required />
-      <!-- <input> is a field where users type.
-           type="text" makes it a single-line text field.
-           placeholder shows gray hint text inside the box.
-           required means the form won't submit if this is empty. -->
+  <button id="convert-btn">Convert</button>
+</div>
 
-      <button type="submit">Add Task</button>
-      <!-- <button> submits the form. type="submit" tells the browser to trigger the form's submit event. -->
-    </form>
-
-    <ul id="task-list"></ul>
-    <!-- <ul> means "unordered list" (aka bullets). Each task will be shown as a list item <li>.
-         We provided code in JavaScript by appending new <li> elements here. -->
+<div id="result-display">
   </div>
 
   <script src="script.js"></script>
