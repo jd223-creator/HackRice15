@@ -54,6 +54,10 @@ body {
   cursor: pointer;
   z-index: 1001; /* Must be above the sidebar */
   transition: transform 0.3s ease-in-out;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* When the sidebar is open, the button moves with it */
