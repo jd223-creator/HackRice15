@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-An AI-powered web application designed for immigrants to easily convert money, bills, and expenses into international currencies from their home country. The app also translates currency names, amounts, and financial terms into the user's preferred language for better understanding. This aims to help new arrivals manage finances in a new country with confidence.
+An AI-powered web application designed for immigrants to easily convert money, bills, and expenses into international currencies. The application also translates currency names, amounts, and financial terms into the user's preferred language for better understanding. This aims to help new arrivals manage finances in a new country with confidence.
 
 ## Core Features
 
