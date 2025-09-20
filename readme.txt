@@ -1,11 +1,10 @@
 # RemitEasy Backend (FastAPI)
 
 ## Run
-python -m venv venv
-source venv/bin/activate
+# Make sure you are in backend/
+source app/venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
-cp .env.example .env
 uvicorn app.main:app --reload
 
 ## API Docs
