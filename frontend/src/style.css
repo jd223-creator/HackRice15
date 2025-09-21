@@ -12,6 +12,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
+  z-index: 1; /* Ensure it's below the sidebar */
 }
 
 /* Sidebar styling */
@@ -27,7 +28,7 @@ body {
   backdrop-filter: blur(10px);
   transform: translateX(-100%); /* Start off-screen */
   transition: transform 0.3s ease-in-out; /* Smooth animation */
-  z-index: 1000;
+  z-index: 2;
   display: flex;
   flex-direction: column;
 }
@@ -41,7 +42,7 @@ body {
 .sidebar-toggle-btn {
   position: fixed;
   top: 20px;
-  left: 20px;
+  left: 10px;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -52,7 +53,7 @@ body {
   line-height: 40px;
   text-align: center;
   cursor: pointer;
-  z-index: 1001; /* Must be above the sidebar */
+  z-index: 3; /* Must be above the sidebar */
   transition: transform 0.3s ease-in-out;
 
   display: flex;
@@ -61,7 +62,7 @@ body {
 }
 
 /* When the sidebar is open, the button moves with it */
-.sidebar.open + .sidebar-toggle-btn {
+.sidebar-toggle-btn.open {
   transform: translateX(400px);
 }
 
