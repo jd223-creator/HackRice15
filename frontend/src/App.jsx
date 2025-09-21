@@ -8,6 +8,100 @@ mapboxgl.accessToken = "pk.eyJ1IjoiYXRtb3N5dngiLCJhIjoiY21mc25ucW51MDhsYTJtb21oY
 // Backend base URL (configure via frontend/.env.local -> VITE_BACKEND_URL=http://127.0.0.1:8000)
 const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
+// ----------------------------------------------------------------------------------------------------
+// ADDED MOCK DATA
+// ----------------------------------------------------------------------------------------------------
+const HOUSTON_BUSINESSES_BY_ZIP = {
+  "77005": {
+    center: [-95.401, 29.718], // Coords for 77005 ZIP code center
+  },
+  "77002": {
+    center: [-95.367, 29.761], // Coords for 77002 ZIP code center
+  },
+  "77027": {
+    center: [-95.427, 29.740], // Coords for 77027 ZIP code center
+  },
+  "77063": {
+    center: [-95.531, 29.754], // Coords for 77063 ZIP code center
+  },
+};
+
+const HOUSTON_BUSINESS_LOCATIONS = [
+  {
+    id: "wu_1",
+    text: "Western Union Agent",
+    place_name: "4112 Bellaire Blvd, Houston, TX 77025",
+    zip_code: "77025",
+    geometry: { coordinates: [-95.421, 29.715] },
+    competitor: { name: "Western Union", fee: 5.00, recipient_gets: 1050.00 },
+    distance_km: 3.5,
+  },
+  {
+    id: "mg_1",
+    text: "MoneyGram at CVS",
+    place_name: "2501 Rice Blvd, Houston, TX 77005",
+    zip_code: "77005",
+    geometry: { coordinates: [-95.405, 29.716] },
+    competitor: { name: "MoneyGram", fee: 4.50, recipient_gets: 1055.00 },
+    distance_km: 1.2,
+  },
+  {
+    id: "ria_1",
+    text: "Ria Money Transfer",
+    place_name: "5225 Buffalo Speedway, Houston, TX 77005",
+    zip_code: "77005",
+    geometry: { coordinates: [-95.412, 29.710] },
+    competitor: { name: "Ria", fee: 3.99, recipient_gets: 1060.00 },
+    distance_km: 2.0,
+  },
+  {
+    id: "wu_2",
+    text: "Western Union at Kroger",
+    place_name: "1931 S Shepherd Dr, Houston, TX 77019",
+    zip_code: "77019",
+    geometry: { coordinates: [-95.402, 29.755] },
+    competitor: { name: "Western Union", fee: 5.00, recipient_gets: 1050.00 },
+    distance_km: 4.1,
+  },
+  {
+    id: "mg_2",
+    text: "MoneyGram at Walmart",
+    place_name: "2727 Dunvale Rd, Houston, TX 77063",
+    zip_code: "77063",
+    geometry: { coordinates: [-95.531, 29.754] },
+    competitor: { name: "MoneyGram", fee: 4.50, recipient_gets: 1055.00 },
+    distance_km: 13.0,
+  },
+  {
+    id: "xoom_1",
+    text: "Xoom",
+    place_name: "3133 Edloe St, Houston, TX 77027",
+    zip_code: "77027",
+    geometry: { coordinates: [-95.414, 29.735] },
+    competitor: { name: "Xoom", fee: 2.99, recipient_gets: 1062.00 },
+    distance_km: 2.8,
+  },
+  {
+    id: "wu_3",
+    text: "Western Union Agent Downtown",
+    place_name: "800 Lamar St, Houston, TX 77002",
+    zip_code: "77002",
+    geometry: { coordinates: [-95.364, 29.758] },
+    competitor: { name: "Western Union", fee: 5.00, recipient_gets: 1050.00 },
+    distance_km: 0.5,
+  },
+  {
+    id: "mg_3",
+    text: "MoneyGram at 7-Eleven",
+    place_name: "1310 Prairie St, Houston, TX 77002",
+    zip_code: "77002",
+    geometry: { coordinates: [-95.359, 29.764] },
+    competitor: { name: "MoneyGram", fee: 4.50, recipient_gets: 1055.00 },
+    distance_km: 0.8,
+  },
+];
+// ----------------------------------------------------------------------------------------------------
+
 function App() {
   // --- State ---
   const [amount, setAmount] = useState("100");
@@ -27,7 +121,9 @@ function App() {
   const [aiBestBizId, setAiBestBizId] = useState(null);
   const [brandConfig, setBrandConfig] = useState({ brands: [], aliases: {}, search_terms: [] });
   const [aiOptions, setAiOptions] = useState([]);
+  const [searchedZipCoords, setSearchedZipCoords] = useState(null); // ADDED
   const markerRefs = useRef([]);
+  const zipMarkerRef = useRef(null); // ADDED
 
   // --- Map setup ---
   const mapContainerRef = useRef(null);
@@ -125,7 +221,7 @@ function App() {
     // Fallback to static local rules
     for (const r of aliasRules) {
       if (s.includes(r.match)) return r.brand;
-    }
+      }
     return null;
   };
 
@@ -138,6 +234,16 @@ function App() {
       else if (m && m.marker && typeof m.marker.remove === 'function') m.marker.remove();
     });
     markerRefs.current = [];
+    
+    // Clear the old zip code marker and add the new one
+    if (zipMarkerRef.current) zipMarkerRef.current.remove();
+    if (searchedZipCoords) {
+      const zipMarker = new mapboxgl.Marker({ color: '#007bff' })
+        .setLngLat(searchedZipCoords)
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML("<strong>Your Searched Location</strong>"))
+        .addTo(mapRef.current);
+      zipMarkerRef.current = zipMarker;
+    }
 
     const best = canonicalBrand(aiBestBrand);
 
@@ -177,7 +283,7 @@ function App() {
 
       markerRefs.current.push({ id: idKey, marker });
     });
-  }, [businesses, aiBestBrand, aiBestBizId, toCurrency]);
+  }, [businesses, aiBestBrand, aiBestBizId, toCurrency, searchedZipCoords]); // ADDED searchedZipCoords
 
   // Choose nearest business for the selected AI brand so only one marker is green
   useEffect(() => {
@@ -279,122 +385,26 @@ function App() {
     setBusinesses([]);
     setZipMessage("");
     setZipLoading(true);
+    setAiBestBrand("");
+    setAiOptions([]);
 
-    try {
-      const geoResponse = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${zipCode}.json?access_token=${mapboxgl.accessToken}&country=US&types=postcode`
-      );
-      const geoData = await geoResponse.json();
+    const mockData = HOUSTON_BUSINESS_LOCATIONS.filter(
+      (biz) => biz.zip_code === zipCode
+    );
 
-      if (geoData.features && geoData.features.length > 0) {
-        const coordinates = geoData.features[0].center;
-        mapRef.current.flyTo({ center: coordinates, zoom: 12 });
+    const zipCenter = HOUSTON_BUSINESSES_BY_ZIP[zipCode];
+    if (zipCenter && mapRef.current) {
+      const coordinates = zipCenter.center;
+      setSearchedZipCoords(coordinates);
+      mapRef.current.flyTo({ center: coordinates, zoom: 12 });
 
-        // Query Mapbox separately for each term to improve results
-        const searchTerms = (brandConfig && Array.isArray(brandConfig.search_terms) && brandConfig.search_terms.length)
-          ? brandConfig.search_terms
-          : [
-              // Default fallback
-              "Western Union",
-              "Western Union Agent",
-              "MoneyGram",
-              "Ria Money Transfer",
-              "Remitly",
-              "Wise",
-              "Xoom",
-              "Walmart MoneyCenter",
-              "Walmart Money Center",
-              "H-E-B",
-              "Kroger Money Services",
-              "ACE Cash Express",
-              "7-Eleven",
-              "CVS",
-              "Walgreens",
-              "Check cashing",
-            ];
-
-        const fetchBrandPOIs = async (brand) => {
-          const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-            brand
-          )}.json?access_token=${mapboxgl.accessToken}&proximity=${coordinates[0]},${coordinates[1]}&types=poi&country=US&autocomplete=false&limit=20`;
-          const res = await fetch(url);
-          if (!res.ok) return { features: [] };
-          return res.json();
-        };
-
-        const results = await Promise.all(searchTerms.map((b) => fetchBrandPOIs(b)));
-        let nearbyBusinesses = results
-          .flatMap((r) => r.features || [])
-          .filter((f) => Array.isArray(f.place_type) && f.place_type.includes("poi"));
-
-        // Compute distance from ZIP centroid for each POI (Haversine)
-        const toRad = (deg) => (deg * Math.PI) / 180;
-        const haversineKm = (lon1, lat1, lon2, lat2) => {
-          const R = 6371; // km
-          const dLat = toRad(lat2 - lat1);
-          const dLon = toRad(lon2 - lon1);
-          const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-          return R * c;
-        };
-        nearbyBusinesses = (nearbyBusinesses || []).map((b) => {
-          const coords = b?.geometry?.coordinates || b?.center;
-          let distance_km = null;
-          if (coords && coords.length >= 2) {
-            distance_km = haversineKm(coordinates[0], coordinates[1], coords[0], coords[1]);
-          }
-          return { ...b, distance_km };
-        });
-
-        // If still nothing, try a broader query as fallback
-        if (nearbyBusinesses.length === 0) {
-          const broadQueries = [
-            "money transfer",
-            "remittance",
-            "wire transfer",
-            "bank",
-            "currency exchange"
-          ];
-          const broadResults = await Promise.all(
-            broadQueries.map((q) =>
-              fetch(
-                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-                  q
-                )}.json?access_token=${mapboxgl.accessToken}&proximity=${coordinates[0]},${coordinates[1]}&types=poi&country=US&autocomplete=false&limit=20`
-              ).then((r) => (r.ok ? r.json() : { features: [] }))
-            )
-          );
-          nearbyBusinesses = broadResults
-            .flatMap((r) => r.features || [])
-            .filter((f) => Array.isArray(f.place_type) && f.place_type.includes("poi"));
-        }
-
-        // Final fallback: drop the strict poi type filter
-        if (nearbyBusinesses.length === 0) {
-          const relaxedResults = await Promise.all(
-            searchTerms.map((brand) =>
-              fetch(
-                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(brand)}.json?access_token=${mapboxgl.accessToken}&proximity=${coordinates[0]},${coordinates[1]}&country=US&autocomplete=false&limit=20`
-              ).then((r) => (r.ok ? r.json() : { features: [] }))
-            )
-          );
-          nearbyBusinesses = relaxedResults.flatMap((r) => r.features || []);
-        }
-
-        // Deduplicate by id
-        const seen = new Set();
-        nearbyBusinesses = nearbyBusinesses.filter((f) => {
-          if (seen.has(f.id)) return false;
-          seen.add(f.id);
-          return true;
-        });
+      if (mockData.length > 0) {
+        setBusinesses(mockData);
+        setZipMessage(`${mockData.length} location(s) found in ${zipCode}`);
 
         // Build canonical brand list for backend scoring using alias rules
         const storesForBackend = Array.from(new Set(
-          (nearbyBusinesses || [])
+          (mockData || [])
             .map((b) => `${b.text || ''} ${b.properties?.category || ''} ${b.place_name || ''}`)
             .map((label) => brandFromLabel(label))
             .filter(Boolean)
@@ -416,31 +426,23 @@ function App() {
           channels = data.channels || [];
         }
 
-        // Attach competitor info (if present) to each POI and sort by best recipient_gets
-        const annotated = nearbyBusinesses.map((biz) => {
+        const annotated = mockData.map((biz) => {
           const label = `${biz.text || ''} ${biz.properties?.category || ''} ${biz.place_name || ''}`;
           const brandName = brandFromLabel(label); // Proper brand like 'Western Union'
           const match = brandName ? channels.find((c) => (c.name || '') === brandName) : null;
           return { ...biz, competitor: match || null, detectedBrand: brandName };
         });
 
-        const sorted = annotated.sort((a, b) => {
-          const ra = a.competitor?.recipient_gets ?? -Infinity;
-          const rb = b.competitor?.recipient_gets ?? -Infinity;
-          return rb - ra;
-        });
-
-        setBusinesses(sorted);
-        setZipMessage(`${sorted.length} location(s) found`);
+        setBusinesses(annotated);
 
         // Fit map to show all found POIs, accounting for sidebars
         const bounds = new mapboxgl.LngLatBounds();
-        (sorted || []).forEach((biz) => {
+        [...annotated, { geometry: { coordinates: coordinates } }].forEach((biz) => {
           const coords = biz?.geometry?.coordinates || biz?.center;
           if (coords && coords.length >= 2) bounds.extend([coords[0], coords[1]]);
         });
+
         if (!bounds.isEmpty()) {
-          // Add padding so markers aren't hidden behind sidebars
           const leftPad = isLocationSidebarOpen ? 420 : 20;
           const rightPad = isCurrencySidebarOpen ? 420 : 20;
           mapRef.current.fitBounds(bounds, {
@@ -449,16 +451,17 @@ function App() {
             duration: 800,
           });
         }
+
       } else {
-        setZipMessage("Could not find location for that ZIP code.");
+        setZipMessage("No money transfer locations found in that ZIP code.");
+        setBusinesses([]);
       }
-    } catch (error) {
-      console.error("Geocoding or backend compare failed:", error);
-      setZipMessage(`Search failed: ${error?.message || 'Network error'}`);
+    } else {
+      setZipMessage("Could not find data for that ZIP code.");
+      setSearchedZipCoords(null);
     }
-    finally {
-      setZipLoading(false);
-    }
+
+    setZipLoading(false);
   };
 
   // AI Optimization (via backend proxy)
@@ -515,7 +518,7 @@ function App() {
         setOptimizationResult(
           `Best: ${data.best.name}. Recipient gets ${data.best.recipient_gets} ${data.currency}. ` +
           (data.best.distance_km != null ? `Distance ~${data.best.distance_km} km` + (data.best.time_min != null ? ` (~${data.best.time_min} min). ` : '. ') : '') +
-          `(Market rate: ${data.market_rate}, Our rate: ${data.our_rate})\n` +
+          ` (Market rate: ${data.market_rate}, Our rate: ${data.our_rate})\n` +
           (data.recommendation || "")
         );
       } else {
@@ -572,7 +575,7 @@ function App() {
           <hr className="divider" />
           <div className="business-list">
             <h3>Money Transfer Locations Nearby</h3>
-            <p className="framework-note">Markers: green = AI pick, blue = priced, gray = no data</p>
+            <p className="framework-note">Markers: blue = your location, green = AI pick, dark blue = priced, gray = no data</p>
             {zipLoading && <p>Searching nearby locations…</p>}
             {zipMessage && <p>{zipMessage}</p>}
             {businesses.length > 0 ? (
@@ -580,7 +583,7 @@ function App() {
                 {businesses.map((biz, idx) => (
                   <li key={biz.id || idx}>
                     <strong>{biz.text}</strong>
-                    <p>{biz.properties?.address || biz.place_name || "Address not available"}</p>
+                    <p>{biz.place_name || "Address not available"}</p>
                     {typeof biz.distance_km === 'number' && (
                       <p>📍 Distance: {biz.distance_km.toFixed(2)} km</p>
                     )}
@@ -596,7 +599,7 @@ function App() {
                 ))}
               </ul>
             ) : (
-              <p>No locations found. Try a new ZIP code.</p>
+              <p>No locations found. Try a new ZIP code from our mock data (77005, 77002, 77027, 77063).</p>
             )}
           </div>
         </div>
