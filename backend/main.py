@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.models.database import engine, Base
 from app.routes import auth, transactions, rates
+from app.routes import ai
 
 
 # Create tables
@@ -29,6 +30,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(transactions.router, prefix="/api/transactions", tags=["transactions"])
 app.include_router(rates.router, prefix="/api/rates", tags=["rates"])
+app.include_router(ai.router, prefix="/api/ai", tags=["ai"])
 
 @app.get("/")
 async def root():
@@ -37,5 +39,4 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
-
 

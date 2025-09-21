@@ -1,0 +1,44 @@
+{
+  "brands": [
+    {
+      "brand": "Western Union",
+      "markup": 0.055,
+      "fixed_fee": 5.99,
+      "aliases": [
+        "western union",
+        "western union agent",
+        "walmart money center",
+        "walmart moneycenter",
+        "kroger money services",
+        "7-eleven",
+        "walgreens",
+        "check cashing"
+      ]
+    },
+    {
+      "brand": "MoneyGram",
+      "markup": 0.048,
+      "fixed_fee": 4.99,
+      "aliases": [
+        "moneygram",
+        "ace cash express",
+        "cvs"
+      ]
+    },
+    { "brand": "Remitly", "markup": 0.035, "fixed_fee": 2.99, "aliases": ["remitly"] },
+    { "brand": "Wise", "markup": 0.025, "fixed_fee": 1.5, "aliases": ["wise", "transferwise"] },
+    { "brand": "Ria", "markup": 0.035, "fixed_fee": 3.99, "aliases": ["ria", "ria money transfer"] },
+    { "brand": "Xoom", "markup": 0.04, "fixed_fee": 3.99, "aliases": ["xoom"] },
+    { "brand": "WorldRemit", "markup": 0.032, "fixed_fee": 3.99, "aliases": ["worldremit"] },
+    { "brand": "OFX", "markup": 0.015, "fixed_fee": 0, "aliases": ["ofx", "ozforex"] },
+    { "brand": "Small World", "markup": 0.038, "fixed_fee": 3, "aliases": ["small world", "smallworld"] },
+    { "brand": "Walmart2Walmart", "markup": 0.05, "fixed_fee": 4, "aliases": ["walmart2walmart", "walmart 2 walmart", "walmart to walmart", "walmart money transfer"] }
+  ],
+  "distance_policy": {
+    "loss_weight": 0.45,
+    "distance_weight": 0.55,
+    "distance_cap_km": 10.0
+  },
+  "overrides": []
+}
+
