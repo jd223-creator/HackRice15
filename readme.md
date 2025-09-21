@@ -1,14 +1,25 @@
 # Finance Connect
 
-A map-based currency tool designed to help Houston's diverse international community navigate global finances. Built by a team of freshmen for HackRice 15.
+A map-based currency tool designed to help Houston's diverse international community navigate global finances.
+
+- **Hackathon**: HackRice 15
+- **Track Submission**: Finance & Entrepreneurship
+- **Challenge Submission**: Best Financial Hack (Capital One)
+
 
 ## Inspiration
 
-As freshmen at Rice, we're constantly amazed by how diverse Houston is. We were inspired by our friends from all over the world who often face the challenge of navigating complex global finances. Sending money home or just understanding a budget in a new country can be stressful. We wanted to build a simple tool to help—something that felt like it was made for Houston's international community.
+As freshmen at Rice, we were inspired by the incredible diversity of Houston. We saw friends from all over the world struggle with navigating global finances, from sending money home to understanding a budget in a new country. Our goal was to build a simple, reliable tool to help—something that truly felt like it was made for Houston's international community.
 
+## Technical
+
+- Front-End: Built with React to create a dynamic user interface. We integrated the Mapbox API to power the live map and location search.
+
+- Back-End: A Python API handles all the data processing, including fetching live currency rates from the Frankfurt API and serving the location data to the front-end.
+  
 ## What It Does
 
-Finance Connect is a web app with a live map of the city as the background. You can type in any Houston ZIP code, and the map instantly flies to that location. A simple sidebar menu slides out to give you a currency converter that uses live, up-to-the-minute exchange rates, so you know exactly how much you're sending or spending.
+Finance Connect is a user-friendly web application with a live, interactive map of Houston. You can enter a local ZIP code, and the map instantly flies to that area, displaying nearby money transfer services. A sidebar provides a real-time currency converter, powered by live exchange rates, so you always know exactly how much you're sending or spending.
 
 ## How We Built It
 
@@ -19,7 +30,7 @@ As beginners, this was our first time connecting a front-end to a back-end!
 
 ## Challenges We Ran Into
 
-Honestly, our biggest challenge was that none of us had ever connected the front-end to the back-end before! We spent hours figuring out why the two parts wouldn't talk to each other, finally learning about a browser security rule called CORS and how to fix it. Just getting the map to load by figuring out how to use an API token felt like a huge win.
+Our biggest challenge was connecting the front-end and back-end for the first time. We spent hours troubleshooting communication errors. Honestly, getting the map to load with its API token felt like a huge win for our team or even loading the currency rates.
 
 ## 🚀 Getting Started
 
@@ -66,6 +77,7 @@ uvicorn main:app --reload
 **Terminal 2 (for the Front-End):**
 ```bash
 # from the /frontend folder
+npm install
 npm run dev
 ```
 
