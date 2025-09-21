@@ -9,6 +9,7 @@ venv/
 
 # Environment variables
 .env
+backend/.env
 
 # Databases
 *.db
